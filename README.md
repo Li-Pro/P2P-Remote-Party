@@ -8,6 +8,6 @@ Version
 ---
 Yet starting 'alpha-1.0'.
 
-Legal
+License
 ---
 This project is licensed under the terms of *Apache License 2.0*
