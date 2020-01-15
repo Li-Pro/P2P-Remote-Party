@@ -1,2 +1,7 @@
 # Internal files
 Project-Local/
+
+# Build files
+venv/
+runClient.bat
+runServer.bat
