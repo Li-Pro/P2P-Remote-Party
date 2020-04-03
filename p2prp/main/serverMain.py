@@ -1,20 +1,40 @@
 import p2prp
-import networkStation as net
+import p2prp.network.networkStation as netst
+import threading
 
-clientList = []
+class ServerStation:
+	def __init__(self):
+		self.lock = threading.Lock()
+		self.sock = None
+		self.clientList = []
+	
+	def __enter__(self):
+		self.lock.acquire()
+	
+	def __exit__(self):
+		self.lock.release()
 
 def runServer():
 	print('Running P2PRP server.')
 	
-	sock = net.hostParty()
-	net.startAuthorization(sock, clientList)
+	station = ServerStation()
+	
+	netst.hostParty(station)
+	netst.startAuthorization(station)
 	
 	while True:
 		command = input('> ')
-		if command == '/stop':
-			break
+		if not command:
+			continue
+		
+		if command[0] != '/':
+			netst.serverSendMsg(station, command)
+		else:
+			cmd = command[1:]
+			if cmd == 'stop':
+				break
 	
-	closeServer(sock, clientList)
+	netst.closeServer(station)
 	
 	return
 
