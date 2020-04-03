@@ -11,9 +11,10 @@ def hostParty(station):
 		station.sock = sock
 		
 		sock.bind(('', 0))
-		sock.listen(1)
+		#sock.listen(1)
+		sock.listen()
 		print('Opening at: ', socket.gethostbyname(socket.gethostname()), ':', sock.getsockname()[1])
-		
+	
 	return
 
 def authorizeClients(station):
@@ -42,7 +43,7 @@ def serverSendMsg(station, msg):
 	# print('Sending Msg: ', msg)
 	
 	for clt in station.clientList:
-		print('Sending "' + str(msg) + '" to: ', clt.getpeername())
+		print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
 		try:
 			clt.send(msg)
 		except:
