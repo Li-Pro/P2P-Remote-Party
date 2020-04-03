@@ -24,8 +24,11 @@ def authorizeClients(station):
 	while True:
 		try:
 			conn, addr = sock.accept()
+			# conn.setblocking(False)
+		
 		except:
 			break
+		
 		else:
 			print('Accepted connection from: ', addr)
 			with station:
@@ -45,9 +48,14 @@ def serverSendMsg(station, msg):
 	for clt in station.clientList:
 		print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
 		try:
+			clt.settimeout(5.0)
 			clt.send(msg)
+		
+		except socket.timeout as e:
+			print('Sending time out.')
+		
 		except:
-			pass
+			print('Sending error.')
 	
 	return
 
@@ -68,7 +76,22 @@ def closeServer(station):
 	return
 
 # Network Client
-def joinParty(station):
+def joinParty(station, rmt):
+	print('Connecting to: ', rmt[0], ':', rmt[1])
+	
+	# try:
+	
+	# Error would stop client.
+	with station:
+		sock = socket.socket()
+		station.sock = sock
+		
+		sock.connect(rmt)
+		sock.listen()
+	
+	# else:
+		# print()
+	
 	return
 
 def leaveParty(station):

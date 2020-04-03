@@ -23,11 +23,6 @@ def runServer():
 	netst.hostParty(station)
 	netst.startAuthorization(station)
 	
-	# Start local server
-	# p2prp.runClient(station.sock.getsockname())
-	# loccrt_thr = threading.Thread(target=p2prp.runClient, args=(station.sock.getsockname(),))
-	# loccrt_thr.start()
-	
 	ext_ip = None
 	while True:
 		try:
@@ -60,8 +55,8 @@ def runServer():
 	
 	return
 
-def main():
-	return
+# def main():
+	# return
 
-if __name__=="__main__":
-	main()
+# if __name__=="__main__":
+	# main()
