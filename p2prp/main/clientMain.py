@@ -1,7 +1,8 @@
 import p2prp
 
-def runClient():
-	print('Running client.')
+def runClient(rmtaddr=None, rmtport=None):
+	print('Running P2PRP client.')
+	
 	return
 
 def main():
