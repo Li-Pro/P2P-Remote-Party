@@ -1,5 +1,46 @@
 import p2prp
-import socket, threading
+import socket, threading, time
+
+# Common Server
+def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
+	try:
+		sock.settimeout(0.1)
+		func(*args)
+	
+	except BlockingIOError:
+		time.sleep(0.01)
+	
+	except socket.timeout:
+		time.sleep(0.01)
+	
+	except Exception as e:
+		print('Exception during timeout: ', type(e), e)
+
+def recievePacket(sock):
+	
+	while True:
+		try:
+			sock.settimeout(0.1)
+			data = sock.recv(1024)
+			if not data:
+				break
+			
+			print('Recieved: "', data, '" from ', sock.getpeername())
+			
+		except BlockingIOError:
+			time.sleep(0.01)
+			continue
+		
+		except socket.timeout:
+			time.sleep(0.01)
+			continue
+		
+		except Exception as e:
+			print('recievePacket error: ', type(e), e)
+			break
+	
+	# Remove client / server here
+	print('Target <', sock.getpeername(),'> disconnected.')
 
 # Network Server
 def hostParty(station):
@@ -11,7 +52,6 @@ def hostParty(station):
 		station.sock = sock
 		
 		sock.bind(('', 0))
-		#sock.listen(1)
 		sock.listen()
 		print('Opening at: ', socket.gethostbyname(socket.gethostname()), ':', sock.getsockname()[1])
 	
@@ -23,9 +63,20 @@ def authorizeClients(station):
 	sock = station.sock
 	while True:
 		try:
+			sock.settimeout(0)
 			conn, addr = sock.accept()
 			# conn.setblocking(False)
 		
+		except BlockingIOError:
+			time.sleep(0.01)
+			continue
+		
+		except socket.timeout:
+			time.sleep(0.01)
+			continue
+		
+		# except Exception as e:
+			# print('Authorization error: ', type(e), e)
 		except:
 			break
 		
@@ -33,6 +84,8 @@ def authorizeClients(station):
 			print('Accepted connection from: ', addr)
 			with station:
 				station.clientList.append(conn)
+				clt_thr = threading.Thread(target=recievePacket, args=(conn,))
+				clt_thr.start()
 	
 	return
 
@@ -43,19 +96,19 @@ def startAuthorization(station):
 	return
 
 def serverSendMsg(station, msg):
-	# print('Sending Msg: ', msg)
-	
 	for clt in station.clientList:
 		print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
-		try:
-			clt.settimeout(5.0)
-			clt.send(msg)
 		
-		except socket.timeout as e:
-			print('Sending time out.')
-		
-		except:
-			print('Sending error.')
+		with clt:
+			try:
+				clt.settimeout(0.1)
+				clt.send(msg)
+			
+			except socket.timeout as e:
+				print('Sending time out.')
+			
+			except:
+				print('Sending error.')
 	
 	return
 
@@ -79,8 +132,6 @@ def closeServer(station):
 def joinParty(station, rmt):
 	print('Connecting to: ', rmt[0], ':', rmt[1])
 	
-	# try:
-	
 	# Error would stop client.
 	with station:
 		sock = socket.socket()
@@ -88,9 +139,6 @@ def joinParty(station, rmt):
 		
 		sock.connect(rmt)
 		sock.listen()
-	
-	# else:
-		# print()
 	
 	return
 

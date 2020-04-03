@@ -41,9 +41,3 @@ def runClient(rmtaddr=None, rmtport=None):
 	netst.leaveParty(station)
 	
 	return
-
-# def main():
-	# return
-
-# if __name__=="__main__":
-	# main()
