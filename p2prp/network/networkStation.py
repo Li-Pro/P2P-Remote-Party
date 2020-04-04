@@ -17,16 +17,20 @@ def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 		time.sleep(0.01)
 		rep = e
 	
-	# except Exception as e:
-		# print('Exception during timeout: ', type(e), e)
-	
 	return rep
 
-def recievePacket(sock):
+# sock = conn NOT station.sock
+def recievePacket(station, sock):
 	
 	while True:
+		
+		#time.sleep(0.01)
+		print('recLOoopp')
+		with station:
+			if not station.isServerOn:
+				break
+		
 		try:
-			# sock.settimeout(0.1)
 			def recPack(sock):
 				data = sock.recv(1024)
 				if not data:
@@ -38,17 +42,11 @@ def recievePacket(sock):
 			if isinstance(data, Exception):
 				continue
 			
+			print('# Recieved: "', data, '" from ', sock.getpeername())
+			
 			if not data:
 				break
 			print('Recieved: "', data, '" from ', sock.getpeername())
-			
-		# except BlockingIOError:
-			# time.sleep(0.01)
-			# continue
-		
-		# except socket.timeout:
-			# time.sleep(0.01)
-			# continue
 		
 		except Exception as e:
 			print('recievePacket error: ', type(e), e)
@@ -75,39 +73,37 @@ def hostParty(station):
 def authorizeClients(station):
 	print('Starting authorization.')
 	
-	sock = station.sock
+	with station:
+		sock = station.sock
+	
 	while True:
-		try:
-			# sock.settimeout(0)
-			def acpPack(sock):
-				return sock.accept()
-			# conn.setblocking(False)
+		# print('Loooooping')
+		
+		print('autLOoopp')
+		# time.sleep(0.01)
+		with station:
+			if not station.isServerOn:
+				break
 			
-			rep = scheduleTimeout(sock, acpPack, (sock,))
-			if isinstance(rep, Exception):
-				continue
+			try:
+				def acpPack(sock):
+					return sock.accept()
+				
+				rep = scheduleTimeout(sock, acpPack, (sock,))
+				if isinstance(rep, Exception):
+					continue
+				
+				conn, addr = rep
 			
-			conn, addr = rep
-		
-		# except BlockingIOError:
-			# time.sleep(0.01)
-			# continue
-		
-		# except socket.timeout:
-			# time.sleep(0.01)
-			# continue
-		
-		except Exception as e:
-			print('Authorization error: ', type(e), e)
-			break
-		# except:
-			# break
-		
-		else:
-			print('Accepted connection from: ', addr)
-			with station:
+			except Exception as e:
+				print('Authorization error: ', type(e), e)
+				break
+			
+			else:
+				print('Accepted connection from: ', addr)
+				#with station:
 				station.clientList.append(conn)
-				clt_thr = threading.Thread(target=recievePacket, args=(conn,))
+				clt_thr = threading.Thread(target=recievePacket, args=(station, conn,))
 				station.subproc.append(clt_thr)
 				clt_thr.start()
 	
@@ -120,13 +116,17 @@ def startAuthorization(station):
 	return
 
 def serverSendMsg(station, msg):
-	for clt in station.clientList:
-		print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
-		
-		with clt:
+	
+	with station:
+		for clt in station.clientList:
+			print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
+			
 			try:
 				clt.settimeout(0.1)
 				clt.send(msg)
+			
+			except BlockingIOError as e:
+				print('Sending time out.')
 			
 			except socket.timeout as e:
 				print('Sending time out.')
@@ -140,13 +140,21 @@ def closeServer(station):
 	print('Closing server.')
 	
 	with station:
-		
+		# print('A')
 		station.sock.close()
-		for proc in station.subproc:
-			proc.join()
+		station.isServerOn = False
 		
-		for clts in station.clientList:
-			serverSendMsg(station, bytes('Server closing.', 'utf-8'))
+		# print('B')
+		subprocs = station.subproc.copy()
+		clts = station.clientList.copy()
+	
+	print('Now closed.')
+	for proc in subprocs:
+		# print('Waiting for: ', proc, proc.target)
+		proc.join()
+	
+	# for clt in clts:
+	serverSendMsg(station, bytes('Server closing.', 'utf-8'))
 		
 		# station.clientList.clear()
 	
@@ -162,9 +170,35 @@ def joinParty(station, rmt):
 		station.sock = sock
 		
 		sock.connect(rmt)
-		sock.listen()
+		# sock.listen()
+	
+	return
+
+def sendMsgToServer(station, msg):
+	
+	with station:
+		sock = station.sock
+		print('Sending "' + str(''.join(map(chr,msg))) + '" to server: ', sock.getpeername())
+		
+		try:
+			sock.settimeout(0.1)
+			sock.send(msg)
+		
+		except BlockingIOError as e:
+			print('Sending time out.')
+		
+		except socket.timeout as e:
+			print('Sending time out.')
+		
+		except:
+			print('Sending error.')
 	
 	return
 
 def leaveParty(station):
+	print('Disconnecting.')
+	
+	with station:
+		station.sock.close()
+	
 	return

@@ -3,7 +3,6 @@ import p2prp.network.networkStation as netst
 import threading
 
 class ClientStation:
-	
 	def __init__(self):
 		self.lock = threading.Lock()
 		self.sock = None
@@ -18,8 +17,8 @@ def runClient(rmtaddr=None, rmtport=None):
 	print('Running P2PRP client.')
 	
 	if rmtaddr == None:
-		rmt = input('Server address & port: ')
-		rmtaddr, rmtport = rmt.split(' ')
+		rmt = input('Server address & port: ').split(' ')
+		rmtaddr, rmtport = rmt[0], int(rmt[1]) # (int(x) for x in rmt.split(' '))
 		# print((rmtaddr, rmtport))
 	
 	station = ClientStation()
@@ -28,14 +27,22 @@ def runClient(rmtaddr=None, rmtport=None):
 	while True:
 		try:
 			command = input('> ')
-			if command == '/leave':
-				break
+			if not command:
+				continue
+			
+			if not command[0] == '/':
+				netst.sendMsgToServer(station, bytes(command, 'utf-8'))
+			
+			else:
+				cmd = command[1:]
+				if cmd == 'leave':
+					break
 		
 		except EOFError:
 			break
 		
-		except:
-			print('Error occured, exiting.')
+		except Exception as e:
+			print('Error occured, exiting.', type(e), e)
 			break
 	
 	netst.leaveParty(station)

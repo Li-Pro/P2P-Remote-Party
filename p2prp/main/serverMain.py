@@ -8,6 +8,8 @@ class ServerStation:
 		self.sock = None
 		self.clientList = []
 		self.subproc = []
+		
+		self.isServerOn = True
 	
 	def __enter__(self):
 		self.lock.acquire()
@@ -37,6 +39,7 @@ def runServer():
 				cmd = command[1:]
 				if cmd == 'stop':
 					break
+				
 				elif cmd == 'ip':
 					import requests
 					if ext_ip == None:
