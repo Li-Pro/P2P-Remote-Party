@@ -3,37 +3,52 @@ import socket, threading, time
 
 # Common Server
 def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
+	
+	rep = None
 	try:
 		sock.settimeout(0.1)
-		func(*args)
+		rep = func(*args)
 	
-	except BlockingIOError:
+	except BlockingIOError as e:
 		time.sleep(0.01)
+		rep = e
 	
-	except socket.timeout:
+	except socket.timeout as e:
 		time.sleep(0.01)
+		rep = e
 	
-	except Exception as e:
-		print('Exception during timeout: ', type(e), e)
+	# except Exception as e:
+		# print('Exception during timeout: ', type(e), e)
+	
+	return rep
 
 def recievePacket(sock):
 	
 	while True:
 		try:
-			sock.settimeout(0.1)
-			data = sock.recv(1024)
+			# sock.settimeout(0.1)
+			def recPack(sock):
+				data = sock.recv(1024)
+				if not data:
+					return data
+				
+				return data
+			
+			data = scheduleTimeout(sock, recPack, (sock,))
+			if isinstance(data, Exception):
+				continue
+			
 			if not data:
 				break
-			
 			print('Recieved: "', data, '" from ', sock.getpeername())
 			
-		except BlockingIOError:
-			time.sleep(0.01)
-			continue
+		# except BlockingIOError:
+			# time.sleep(0.01)
+			# continue
 		
-		except socket.timeout:
-			time.sleep(0.01)
-			continue
+		# except socket.timeout:
+			# time.sleep(0.01)
+			# continue
 		
 		except Exception as e:
 			print('recievePacket error: ', type(e), e)
@@ -63,28 +78,37 @@ def authorizeClients(station):
 	sock = station.sock
 	while True:
 		try:
-			sock.settimeout(0)
-			conn, addr = sock.accept()
+			# sock.settimeout(0)
+			def acpPack(sock):
+				return sock.accept()
 			# conn.setblocking(False)
+			
+			rep = scheduleTimeout(sock, acpPack, (sock,))
+			if isinstance(rep, Exception):
+				continue
+			
+			conn, addr = rep
 		
-		except BlockingIOError:
-			time.sleep(0.01)
-			continue
+		# except BlockingIOError:
+			# time.sleep(0.01)
+			# continue
 		
-		except socket.timeout:
-			time.sleep(0.01)
-			continue
+		# except socket.timeout:
+			# time.sleep(0.01)
+			# continue
 		
-		# except Exception as e:
-			# print('Authorization error: ', type(e), e)
-		except:
+		except Exception as e:
+			print('Authorization error: ', type(e), e)
 			break
+		# except:
+			# break
 		
 		else:
 			print('Accepted connection from: ', addr)
 			with station:
 				station.clientList.append(conn)
 				clt_thr = threading.Thread(target=recievePacket, args=(conn,))
+				station.subproc.append(clt_thr)
 				clt_thr.start()
 	
 	return
