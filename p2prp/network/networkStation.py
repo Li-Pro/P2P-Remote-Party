@@ -22,14 +22,10 @@ def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 # sock = conn NOT station.sock
 def recievePacket(station, sock):
 	
-	while True:
+	while station.isServerOn:
 		
 		#time.sleep(0.01)
-		print('recLOoopp')
-		with station:
-			if not station.isServerOn:
-				break
-		
+		# print('recLOoopp')
 		try:
 			def recPack(sock):
 				data = sock.recv(1024)
@@ -76,20 +72,16 @@ def authorizeClients(station):
 	with station:
 		sock = station.sock
 	
-	while True:
-		# print('Loooooping')
-		
-		print('autLOoopp')
-		# time.sleep(0.01)
-		with station:
-			if not station.isServerOn:
-				break
+	while station.isServerOn:
+			# print('autLOoopp')
+			# time.sleep(0.01)
 			
 			try:
-				def acpPack(sock):
-					return sock.accept()
+				def acpPack(station, sock):
+					with station:
+						return sock.accept()
 				
-				rep = scheduleTimeout(sock, acpPack, (sock,))
+				rep = scheduleTimeout(sock, acpPack, (station, sock,))
 				if isinstance(rep, Exception):
 					continue
 				
@@ -101,18 +93,21 @@ def authorizeClients(station):
 			
 			else:
 				print('Accepted connection from: ', addr)
-				#with station:
-				station.clientList.append(conn)
-				clt_thr = threading.Thread(target=recievePacket, args=(station, conn,))
-				station.subproc.append(clt_thr)
-				clt_thr.start()
+				with station:
+					station.clientList.append(conn)
+					clt_thr = threading.Thread(target=recievePacket, args=(station, conn,))
+					station.subproc.append(clt_thr)
+					clt_thr.start()
 	
+	print('Thread auth stopped.')
 	return
 
 def startAuthorization(station):
-	auth_thr = threading.Thread(target=authorizeClients, args=(station,))
-	station.subproc.append(auth_thr)
-	auth_thr.start()
+	with station:
+		auth_thr = threading.Thread(target=authorizeClients, args=(station,))
+		station.subproc.append(auth_thr)
+		auth_thr.start()
+	
 	return
 
 def serverSendMsg(station, msg):
@@ -140,21 +135,24 @@ def closeServer(station):
 	print('Closing server.')
 	
 	with station:
-		# print('A')
-		station.sock.close()
-		station.isServerOn = False
+		# # print('A')
+		# # station.sock.close()
+		# # station.isServerOn = False
 		
-		# print('B')
+		# # print('B')
 		subprocs = station.subproc.copy()
-		clts = station.clientList.copy()
+		# clts = station.clientList.copy()
+	
+	station.isServerOn = False
 	
 	print('Now closed.')
 	for proc in subprocs:
 		# print('Waiting for: ', proc, proc.target)
+		# proc.join()
 		proc.join()
 	
 	# for clt in clts:
-	serverSendMsg(station, bytes('Server closing.', 'utf-8'))
+	# serverSendMsg(station, bytes('Server closing.', 'utf-8'))
 		
 		# station.clientList.clear()
 	
