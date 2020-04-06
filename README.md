@@ -6,8 +6,10 @@ Useful when playing 2-Player PC games remotely.
 
 Version
 ---
-Yet starting 'alpha-1.0'.
-- Nothing is working yet.
+Version alpha-pre1.
+### Phase 1/3
+- Constructed basic utilities.
+- Implemented network functions of two sides.
 
 License
 ---
