@@ -24,7 +24,9 @@ def recievePacket(station, ssock):
 			print('recievePacket error: ', type(e), e)
 			break
 	
-	# Remove client / server here
+	if station.isServerOn:
+		station.clientList.remove(ssock)
+	
 	print('Target <', sock.getpeername(),'> disconnected.')
 
 
@@ -72,26 +74,20 @@ def authorizeClients(station):
 						continue
 					
 					sconn = netst.SafeSocket(conn)
-					station.clientList.append(sconn)
+					station.clientList.add(sconn)
 					
 					station.addProcess(target=recievePacket, args=(station, sconn,))
-					# clt_thr = threading.Thread(target=recievePacket, args=(station, sconn,))
-					# station.subproc.append(clt_thr)
-					# clt_thr.start()
 	
 	return
 
 def startAuthorization(station):
 	with station:
 		station.addProcess(target=authorizeClients, args=(station,))
-		# auth_thr = threading.Thread(target=authorizeClients, args=(station,))
-		# station.subproc.append(auth_thr)
-		# auth_thr.start()
 	
 	return
 
 def serverSendMsg(station, msg):
-	cllist = []
+	cllist = {}
 	with station:
 		cllist = station.clientList
 	

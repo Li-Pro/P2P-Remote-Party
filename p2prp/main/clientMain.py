@@ -6,6 +6,15 @@ class ClientStation:
 	def __init__(self):
 		self.lock = threading.Lock()
 		self.sock = None
+		
+		self.subproc = []
+		
+		self.isClientActive = True
+	
+	def addProcess(self, *args, **kwargs):
+		nproc = threading.Thread(*args, **kwargs)
+		self.subproc.append(nproc)
+		nproc.start()
 	
 	def __enter__(self):
 		self.lock.acquire()
@@ -23,7 +32,7 @@ def runClient(rmtaddr=None, rmtport=None):
 	station = ClientStation()
 	netst.joinParty(station, (rmtaddr, rmtport))
 	
-	while True:
+	while station.isClientActive:
 		try:
 			command = input('> ')
 			if not command:

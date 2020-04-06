@@ -6,7 +6,8 @@ class ServerStation:
 	def __init__(self):
 		self.lock = threading.Lock()
 		self.sock = None
-		self.clientList = []
+		
+		self.clientList = set()
 		self.subproc = []
 		
 		self.isServerOn = True
