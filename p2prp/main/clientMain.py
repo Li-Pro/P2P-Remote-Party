@@ -1,5 +1,5 @@
 import p2prp
-import p2prp.network.networkStation as netst
+import p2prp.network.networkClient as netst
 import threading
 
 class ClientStation:
@@ -18,8 +18,7 @@ def runClient(rmtaddr=None, rmtport=None):
 	
 	if rmtaddr == None:
 		rmt = input('Server address & port: ').split(' ')
-		rmtaddr, rmtport = rmt[0], int(rmt[1]) # (int(x) for x in rmt.split(' '))
-		# print((rmtaddr, rmtport))
+		rmtaddr, rmtport = rmt[0], int(rmt[1])
 	
 	station = ClientStation()
 	netst.joinParty(station, (rmtaddr, rmtport))

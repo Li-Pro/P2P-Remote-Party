@@ -1,5 +1,5 @@
 import p2prp
-import p2prp.network.networkStation as netst
+import p2prp.network.networkServer as netst
 import threading
 
 class ServerStation:
@@ -12,6 +12,9 @@ class ServerStation:
 		self.isServerOn = True
 	
 	def __enter__(self):
+		if not self.isServerOn:
+			raise Exception('Server is closed.')
+		
 		self.lock.acquire()
 	
 	def __exit__(self, type, value, traceback):
