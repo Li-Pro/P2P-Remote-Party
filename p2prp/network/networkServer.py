@@ -7,23 +7,28 @@ def recievePacket(station, ssock):
 		try:
 			with ssock:
 				sock = ssock.sock
-				def recPack(ssock):
-					data = sock.recv(1024)
-					if not data:
-						return data
-					
-					return data
+				#def recPack(ssock):
+				sock.settimeout(0.1)
+				data = sock.recv(1024)
+				# if not data:
+					# return data
+				if not data:
+					break
 				
-				data = netst.scheduleTimeout(sock, recPack, (ssock,), scintv=0)
-				if not isinstance(data, Exception):
-					print('Recieved: "', str(''.join(map(chr, data))), '" from ', sock.getpeername())
+				# return data
+				
+				# data = netst.scheduleTimeout(sock, recPack, (ssock,), scintv=0)
+				# if not isinstance(data, Exception):
+				
+				print('Recieved: "', str(''.join(map(chr, data))), '" from ', sock.getpeername())
 			
-			if isinstance(data, Exception):
-				time.sleep(0.01)
-				continue
-			
-			if not data:
-				break
+			# if isinstance(data, Exception):
+				# time.sleep(0.01)
+				# continue
+		
+		except netst.BLOCKING_EXCP:
+			time.sleep(0.01)
+			continue
 		
 		except Exception as e:
 			print('recievePacket error: ', type(e), e)
@@ -94,24 +99,33 @@ def startAuthorization(station):
 	return
 
 def serverSendMsg(station, msg):
+	cllist = []
 	with station:
-		for sclt in station.clientList:
+		cllist = station.clientList
+	
+	print('Loop_st')
+	for sclt in cllist:
+		try:
+			print('Trying to acquire lock: ')
 			with sclt:
+				print('Lock acquired.')
 				clt = sclt.sock
 				print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
 				
-				try:
-					clt.settimeout(0.1)
-					clt.send(msg)
-				
-				except BlockingIOError as e:
-					print('Sending time out.')
-				
-				except socket.timeout as e:
-					print('Sending time out.')
-				
-				except:
-					print('Sending error.')
+				clt.settimeout(0.1)
+				clt.send(msg)
+		
+		except netst.BLOCKING_EXCP:
+			print('Sending time out.')
+		
+		# except BlockingIOError as e:
+			# print('Sending time out.')
+		
+		# except socket.timeout as e:
+			# print('Sending time out.')
+		
+		except:
+			print('Sending error.')
 	
 	return
 

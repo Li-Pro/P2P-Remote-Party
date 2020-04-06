@@ -1,6 +1,8 @@
 # import p2prp
 import socket, threading, time
 
+BLOCKING_EXCP = (BlockingIOError, socket.timeout)
+
 # Common Server
 class SafeSocket:
 	def __init__(self, sock):
@@ -19,12 +21,16 @@ def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 		sock.settimeout(sctime)
 		rep = func(*args)
 	
-	except BlockingIOError as e:
+	except BLOCKING_EXCP as e:
 		time.sleep(scintv)
 		rep = e
 	
-	except socket.timeout as e:
-		time.sleep(scintv)
-		rep = e
+	# except BlockingIOError as e:
+		# time.sleep(scintv)
+		# rep = e
+	
+	# except socket.timeout as e:
+		# time.sleep(scintv)
+		# rep = e
 	
 	return rep
