@@ -2,6 +2,18 @@
 import socket, threading, time
 
 # Common Server
+class SafeSocket:
+	def __init__(self, sock):
+		self.sklock = threading.Lock()
+		self.sock = sock
+	
+	def __enter__(self):
+		self.sklock.acquire()
+	
+	def __exit__(self, type, value, traceback):
+		self.sklock.release()
+	
+
 def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 	
 	rep = None
@@ -18,31 +30,3 @@ def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 		rep = e
 	
 	return rep
-
-def recievePacket(station, sock):
-	# sock = conn NOT station.sock
-	while station.isServerOn:
-		try:
-			def recPack(sock):
-				data = sock.recv(1024)
-				if not data:
-					return data
-				
-				return data
-			
-			data = scheduleTimeout(sock, recPack, (sock,))
-			if isinstance(data, Exception):
-				continue
-			
-			# print('# Recieved: "', data, '" from ', sock.getpeername())
-			
-			if not data:
-				break
-			print('Recieved: "', data, '" from ', sock.getpeername())
-		
-		except Exception as e:
-			print('recievePacket error: ', type(e), e)
-			break
-	
-	# Remove client / server here
-	print('Target <', sock.getpeername(),'> disconnected.')

@@ -10,11 +10,9 @@ class ServerStation:
 		self.subproc = []
 		
 		self.isServerOn = True
+		############## self.serverOff = threading.Event()
 	
 	def __enter__(self):
-		if not self.isServerOn:
-			raise Exception('Server is closed.')
-		
 		self.lock.acquire()
 	
 	def __exit__(self, type, value, traceback):
