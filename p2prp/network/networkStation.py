@@ -12,21 +12,19 @@ class SafeSocket:
 	
 	def __exit__(self, type, value, traceback):
 		self.sklock.release()
-	
 
 def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
-	
 	rep = None
 	try:
-		sock.settimeout(0.1)
+		sock.settimeout(sctime)
 		rep = func(*args)
 	
 	except BlockingIOError as e:
-		time.sleep(0.01)
+		time.sleep(scintv)
 		rep = e
 	
 	except socket.timeout as e:
-		time.sleep(0.01)
+		time.sleep(scintv)
 		rep = e
 	
 	return rep

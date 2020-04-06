@@ -10,7 +10,6 @@ class ServerStation:
 		self.subproc = []
 		
 		self.isServerOn = True
-		############## self.serverOff = threading.Event()
 	
 	def __enter__(self):
 		self.lock.acquire()
@@ -51,8 +50,8 @@ def runServer():
 		except EOFError:
 			break
 		
-		except:
-			print('Error occured, terminating server.')
+		except Exception as e:
+			print('Error occured, terminating server: ', type(e), e)
 			break
 	
 	netst.closeServer(station)
