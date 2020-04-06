@@ -11,6 +11,11 @@ class ServerStation:
 		
 		self.isServerOn = True
 	
+	def addProcess(self, *args, **kwargs):
+		nproc = threading.Thread(*args, **kwargs)
+		self.subproc.append(nproc)
+		nproc.start()
+	
 	def __enter__(self):
 		self.lock.acquire()
 	

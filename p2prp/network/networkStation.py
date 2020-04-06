@@ -25,12 +25,4 @@ def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 		time.sleep(scintv)
 		rep = e
 	
-	# except BlockingIOError as e:
-		# time.sleep(scintv)
-		# rep = e
-	
-	# except socket.timeout as e:
-		# time.sleep(scintv)
-		# rep = e
-	
 	return rep
