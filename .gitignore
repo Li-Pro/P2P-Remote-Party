@@ -5,3 +5,5 @@ Project-Local/
 venv/
 runClient.bat
 runServer.bat
+
+**/__pycache__
