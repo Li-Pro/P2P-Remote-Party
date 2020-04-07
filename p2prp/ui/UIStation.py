@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.font as tkfont
 import tkinter.scrolledtext
 
+import queue
+
 class LoggerConsole:
 	def __init__(self):
 		root = tk.Tk()
@@ -12,7 +14,30 @@ class LoggerConsole:
 		inp = tk.Entry(root, font=tkfont.Font(family='Consolas', size=14))
 		inp.grid(row=1, column=0, sticky='nsew')
 		
-		self.root, self.logt, self.inp = root, logt, inp
+		self.root = root
+		self.logt = logt
+		self.inp = inp
+		
+		self.msgQueue = queue.Queue()
+	
+	def addLog(self, msg):
+		self.msgQueue.put(msg)
+	
+	def scheduleUpdate(self):
+		self.root.after(10, self.updateLogger)
+	
+	def updateLogger(self):
+		root, logt, qu = self.root, self.logt, self.msgQueue
+		
+		# if not qu.empty():
+		while not qu.empty():
+			msg = qu.get()
+			
+			logt.configure(state='normal')
+			logt.insert('end', str(msg) + '\n')
+			logt.configure(state='disabled')
+		
+		root.after(10, self.updateLogger)
 
 def hostConsole():
 	console = LoggerConsole()

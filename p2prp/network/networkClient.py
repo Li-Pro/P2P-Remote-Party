@@ -17,7 +17,8 @@ def recieveMsg(station):
 					station.isClientActive = False
 					break
 				
-				print('Recieved from server: ', str(''.join(map(chr, data))))
+				station.console.addLog('Recieved from server: ' + str(''.join(map(chr, data))))
+				# print('Recieved from server: ', str(''.join(map(chr, data))))
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)

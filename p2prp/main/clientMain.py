@@ -4,16 +4,17 @@ import p2prp.ui.UIStation as guist
 import threading
 
 class ClientStation:
-	def __init__(self):
+	def __init__(self, console):
 		self.lock = threading.Lock()
 		self.sock = None
+		self.console = console
 		
 		self.subproc = []
 		
 		self.isClientActive = False
 	
-	def renew(self):
-		self.__init__()
+	def renew(self, console):
+		self.__init__(console)
 	
 	def addProcess(self, *args, **kwargs):
 		nproc = threading.Thread(*args, **kwargs)
@@ -29,9 +30,9 @@ class ClientStation:
 def runClient(rmtaddr=None, rmtport=None):
 	print('Running P2PRP client.')
 	
-	station = ClientStation()
-	
 	console = guist.hostConsole()
+	station = ClientStation(console)
+	
 	root, logt, inp = console.root, console.logt, console.inp
 	
 	def submitCommand(e):
@@ -42,10 +43,11 @@ def runClient(rmtaddr=None, rmtport=None):
 		
 		try:
 			if not command[0] == '/':
-				logt.configure(state='normal')
-				logt.insert('end', inp.get() + '\n')
-				logt.configure(state='disabled')
+				# logt.configure(state='normal')
+				# logt.insert('end', inp.get() + '\n')
+				# logt.configure(state='disabled')
 				
+				console.addLog(inp.get())
 				netst.sendMsgToServer(station, bytes(command, 'utf-8'))
 			
 			else:
@@ -53,10 +55,8 @@ def runClient(rmtaddr=None, rmtport=None):
 				opt = cmds[1:]
 				cmd = cmds[0]
 				
-				# print('##', cmd, opt)
 				if cmd == 'leave':
 					netst.leaveParty(station)
-					# break
 				
 				elif cmd == 'join':
 					assert (len(opt) >= 2)
@@ -65,10 +65,13 @@ def runClient(rmtaddr=None, rmtport=None):
 						print('Already in connection.')
 						return
 					
-					# station = ClientStation()
-					station.renew()
+					station.renew(console)
 					rmtaddr, rmtport = opt[0], int(opt[1])
 					netst.joinParty(station, (rmtaddr, rmtport))
+				
+				elif cmd == 'stop':
+					station.console.root.destroy()
+					return
 				
 				else:
 					pass
@@ -84,40 +87,11 @@ def runClient(rmtaddr=None, rmtport=None):
 	
 	root.bind('<Return>', submitCommand)
 	root.bind('<Button-1>', lambda e: inp.focus_set())
+	
+	console.scheduleUpdate()
 	root.mainloop()
 	
 	if station.isClientActive:
 		netst.leaveParty(station)
-	
-	return
-	
-	# if rmtaddr == None:
-		# rmt = input('Server address & port: ').split(' ')
-		# rmtaddr, rmtport = rmt[0], int(rmt[1])
-	
-	netst.joinParty(station, (rmtaddr, rmtport))
-	
-	while station.isClientActive:
-		try:
-			command = input('> ')
-			if not command:
-				continue
-			
-			if not command[0] == '/':
-				netst.sendMsgToServer(station, bytes(command, 'utf-8'))
-			
-			else:
-				cmd = command[1:]
-				if cmd == 'leave':
-					break
-		
-		except EOFError:
-			break
-		
-		except Exception as e:
-			print('Error occured, exiting.', type(e), e)
-			break
-	
-	netst.leaveParty(station)
 	
 	return
