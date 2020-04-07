@@ -10,7 +10,7 @@ class ClientStation:
 		
 		self.subproc = []
 		
-		self.isClientActive = True
+		self.isClientActive = False
 	
 	def addProcess(self, *args, **kwargs):
 		nproc = threading.Thread(*args, **kwargs)
@@ -27,7 +27,21 @@ def runClient(rmtaddr=None, rmtport=None):
 	print('Running P2PRP client.')
 	
 	console = guist.hostConsole()
-	console.mainloop()
+	root, logt, inp = console.root, console.logt, console.inp
+	
+	def submitCommand(e):
+		if not inp.get():
+			return
+		
+		logt.configure(state='normal')
+		logt.insert('end', inp.get() + '\n')
+		logt.configure(state='disabled')
+		inp.delete(0, 'end')
+		
+		return
+	
+	root.bind('<Return>', submitCommand)
+	root.mainloop()
 	
 	if rmtaddr == None:
 		rmt = input('Server address & port: ').split(' ')

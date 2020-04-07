@@ -10,7 +10,7 @@ class ServerStation:
 		self.clientList = set()
 		self.subproc = []
 		
-		self.isServerOn = True
+		self.isServerOn = False
 	
 	def addProcess(self, *args, **kwargs):
 		nproc = threading.Thread(*args, **kwargs)

@@ -40,6 +40,8 @@ def hostParty(station):
 		
 		sock.bind(('', 0))
 		sock.listen()
+		
+		station.isServerOn = True
 		print('Opening at: ', socket.gethostbyname(socket.gethostname()), ':', sock.getsockname()[1])
 	
 	return

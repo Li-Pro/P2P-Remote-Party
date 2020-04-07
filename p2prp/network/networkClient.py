@@ -39,6 +39,8 @@ def joinParty(station, rmt):
 		
 		sock.connect(rmt)
 		station.addProcess(target=recieveMsg, args=(station,))
+		
+		station.isClientActive = True
 	
 	return
 
