@@ -22,10 +22,7 @@ def recieveMsg(station):
 					station.isClientActive = False
 					break
 				
-				# station.console.addLog(LOG_MARK + 'Recieved from server: ' + str(''.join(map(chr, data))))
-				# station.console.addLog(util.toStr(LOG_MARK, 'Recieved from server: ', str(''.join(map(chr, data)))))
 				printLog(station, 'Recieved from server: ', str(''.join(map(chr, data))))
-				# print('Recieved from server: ', str(''.join(map(chr, data))))
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)
@@ -35,15 +32,13 @@ def recieveMsg(station):
 			print('Error during listening: ', type(e), e)
 			break
 	
-	print('Server closed.')
+	printLog(station, 'Connection closed.')
 	return
 
 def joinParty(station, rmt):
-	# print('Connecting to: ', rmt[0], ':', rmt[1])
 	
 	# Error would stop client.
 	with station:
-		# station.console.addLog(util.toStr(LOG_MARK, 'Connecting to: ', rmt[0], ':', rmt[1]))
 		printLog(station, 'Connecting to: ', rmt[0], ':', rmt[1])
 		sock = socket.socket()
 		station.sock = sock
@@ -62,8 +57,6 @@ def sendMsgToServer(station, msg):
 	
 	with station:
 		sock = station.sock
-		# print('Sending "' + str(''.join(map(chr,msg))) + '" to server: ', sock.getpeername())
-		# station.console.addLog(util.toStr(LOG_MARK, 'Sending "' + str(''.join(map(chr,msg))) + '" to server.'))
 		printLog(station, 'Sending "' + str(''.join(map(chr,msg))) + '" to server.')
 		
 		try:
@@ -83,11 +76,9 @@ def sendMsgToServer(station, msg):
 
 def leaveParty(station):
 	if not station.isClientActive:
-		# print('No active connection.')
-		printLog(station, 'No active connection.')
+		print('No active connection.')
 		return
 	
-	# print('Disconnecting.')
 	printLog(station, 'Disconnecting.')
 	
 	with station:

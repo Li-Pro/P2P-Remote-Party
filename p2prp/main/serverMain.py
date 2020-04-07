@@ -1,11 +1,13 @@
 import p2prp
 import p2prp.network.networkServer as netst
+import p2prp.ui.UIStation as guist
 import threading
 
 class ServerStation:
-	def __init__(self):
+	def __init__(self, console):
 		self.lock = threading.Lock()
 		self.sock = None
+		self.console = console
 		
 		self.clientList = set()
 		self.subproc = []
@@ -23,43 +25,93 @@ class ServerStation:
 	def __exit__(self, type, value, traceback):
 		self.lock.release()
 
+LOG_MARK = '[serverMain]: '
+
+def printLog(station, *args):
+	station.console.addLog(util.toStr(LOG_MARK, *args))
+
 def runServer():
 	print('Running P2PRP server.')
 	
-	station = ServerStation()
+	console = guist.hostConsole()
+	station = ServerStation(console)
+	
+	root, logt, inp = console.root, console.logt, console.inp
 	
 	netst.hostParty(station)
 	netst.startAuthorization(station)
 	
 	ext_ip = None
-	while True:
+	def submitCommand(e):
+		if not inp.get():
+			return
+		
+		command = inp.get()
+		
 		try:
-			command = input('> ')
-			if not command:
-				continue
-			
 			if command[0] != '/':
 				netst.serverSendMsg(station, bytes(command, 'utf-8'))
 			
 			else:
 				cmd = command[1:]
 				if cmd == 'stop':
-					break
+					root.destroy()
+					return
 				
 				elif cmd == 'ip':
 					import requests
 					if ext_ip == None:
 						ext_ip = requests.get('https://api.ipify.org').text
 					
-					print('External ip: ', ext_ip)
-		
-		except EOFError:
-			break
+					# print('External ip: ', ext_ip)
 		
 		except Exception as e:
-			print('Error occured, terminating server: ', type(e), e)
-			break
+			print('Error occured, exiting.', type(e), e)
+		
+		logt.see('end')
+		inp.delete(0, 'end')
+		
+		return
+	
+	root.bind('<Return>', submitCommand)
+	root.bind('<Button-1>', lambda e: inp.focus_set())
+	
+	console.scheduleUpdate()
+	root.mainloop()
 	
 	netst.closeServer(station)
 	
 	return
+	
+	# while True:
+		# try:
+			# command = input('> ')
+			# if not command:
+				# continue
+			
+			# if command[0] != '/':
+				# netst.serverSendMsg(station, bytes(command, 'utf-8'))
+			
+			# else:
+				# cmd = command[1:]
+				# if cmd == 'stop':
+					# break
+				
+				# elif cmd == 'ip':
+					# import requests
+					# if ext_ip == None:
+						# ext_ip = requests.get('https://api.ipify.org').text
+					
+					# # print('External ip: ', ext_ip)
+					# printLog(station, 'External ip: ', ext_ip)
+		
+		# except EOFError:
+			# break
+		
+		# except Exception as e:
+			# print('Error occured, terminating server: ', type(e), e)
+			# break
+	
+	# netst.closeServer(station)
+	
+	# return

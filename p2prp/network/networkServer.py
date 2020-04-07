@@ -1,5 +1,11 @@
 import p2prp.network.networkStation as netst
+import p2prp.util.utilStation as util
 import socket, threading, time
+
+LOG_MARK = '[networkServer] '
+
+def printLog(station, *args):
+	station.console.addLog(util.toStr(LOG_MARK, *args))
 
 # Network Server
 def recievePacket(station, ssock):
@@ -14,7 +20,8 @@ def recievePacket(station, ssock):
 				if not data:
 					break
 				
-				print('Recieved: "', str(''.join(map(chr, data))), '" from ', sock.getpeername())
+				# print('Recieved: "', str(''.join(map(chr, data))), '" from ', sock.getpeername())
+				printLog(station, 'Recieved: "', str(''.join(map(chr, data))), '" from ', sock.getpeername())
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)
@@ -27,11 +34,13 @@ def recievePacket(station, ssock):
 	if station.isServerOn:
 		station.clientList.remove(ssock)
 	
-	print('Target <', sock.getpeername(),'> disconnected.')
+	# print('Target <', sock.getpeername(),'> disconnected.')
+	printLog(station, 'Target <', sock.getpeername(),'> disconnected.')
 
 
 def hostParty(station):
-	print('Hosting party.')
+	# print('Hosting party.')
+	printLog(station, 'Hosting party.')
 	
 	# Error hosting will stop server.
 	with station:
@@ -42,7 +51,8 @@ def hostParty(station):
 		sock.listen()
 		
 		station.isServerOn = True
-		print('Opening at: ', socket.gethostbyname(socket.gethostname()), ':', sock.getsockname()[1])
+		# print('Opening at: ', socket.gethostbyname(socket.gethostname()), ':', sock.getsockname()[1])
+		printLog(station, 'Opening at: ', socket.gethostbyname(socket.gethostname()), ':', sock.getsockname()[1])
 	
 	return
 
@@ -69,10 +79,12 @@ def authorizeClients(station):
 				break
 			
 			else:
-				print('Accepted connection from: ', addr)
+				# print('Accepted connection from: ', addr)
+				printLog(station, 'Accepted connection from: ', addr)
 				with station:
 					if not station.isServerOn:
-						print('Blocking connectiong: server is off.')
+						# print('Blocking connectiong: server is off.')
+						printLog(station, 'Blocking connectiong: server is off.')
 						continue
 					
 					sconn = netst.SafeSocket(conn)
@@ -97,7 +109,8 @@ def serverSendMsg(station, msg):
 		try:
 			with sclt:
 				clt = sclt.sock
-				print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
+				# print('Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
+				printLog(station, 'Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
 				
 				clt.settimeout(0.1)
 				clt.send(msg)

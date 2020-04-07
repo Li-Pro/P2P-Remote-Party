@@ -66,7 +66,7 @@ def runClient(rmtaddr=None, rmtport=None):
 					netst.joinParty(station, (rmtaddr, rmtport))
 				
 				elif cmd == 'stop':
-					station.console.root.destroy()
+					root.destroy()
 					return
 				
 				else:
