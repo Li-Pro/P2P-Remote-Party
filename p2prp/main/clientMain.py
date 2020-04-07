@@ -1,5 +1,6 @@
 import p2prp
 import p2prp.network.networkClient as netst
+import p2prp.ui.UIStation as guist
 import threading
 
 class ClientStation:
@@ -24,6 +25,9 @@ class ClientStation:
 
 def runClient(rmtaddr=None, rmtport=None):
 	print('Running P2PRP client.')
+	
+	console = guist.hostConsole()
+	console.mainloop()
 	
 	if rmtaddr == None:
 		rmt = input('Server address & port: ').split(' ')
