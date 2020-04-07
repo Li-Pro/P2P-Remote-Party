@@ -43,11 +43,7 @@ def runClient(rmtaddr=None, rmtport=None):
 		
 		try:
 			if not command[0] == '/':
-				# logt.configure(state='normal')
-				# logt.insert('end', inp.get() + '\n')
-				# logt.configure(state='disabled')
-				
-				console.addLog(inp.get())
+				# console.addLog(inp.get())
 				netst.sendMsgToServer(station, bytes(command, 'utf-8'))
 			
 			else:
@@ -78,7 +74,6 @@ def runClient(rmtaddr=None, rmtport=None):
 		
 		except Exception as e:
 			print('Error occured, exiting.', type(e), e)
-			return
 		
 		logt.see('end')
 		inp.delete(0, 'end')

@@ -8,10 +8,15 @@ class LoggerConsole:
 	def __init__(self):
 		root = tk.Tk()
 		
-		logt = tk.scrolledtext.ScrolledText(root, state='disabled', bg='#eeeeee')
-		logt.grid(row=0, column=0)
+		logfnt = tkfont.Font(family='Consolas', size=14)
 		
-		inp = tk.Entry(root, font=tkfont.Font(family='Consolas', size=14))
+		root.grid_rowconfigure(0, weight=1)
+		root.grid_columnconfigure(0, weight=1)
+		
+		logt = tk.scrolledtext.ScrolledText(root, state='disabled', bg='#eeeeee', font=logfnt)
+		logt.grid(row=0, column=0, sticky='nsew')
+		
+		inp = tk.Entry(root, font=logfnt)
 		inp.grid(row=1, column=0, sticky='nsew')
 		
 		self.root = root
@@ -23,13 +28,18 @@ class LoggerConsole:
 	def addLog(self, msg):
 		self.msgQueue.put(msg)
 	
+	def addWarning(self, msg):
+		self.msgQueue.put(msg)
+	
+	def addError(self, msg):
+		self.msgQueue.put(msg)
+	
 	def scheduleUpdate(self):
 		self.root.after(10, self.updateLogger)
 	
 	def updateLogger(self):
 		root, logt, qu = self.root, self.logt, self.msgQueue
 		
-		# if not qu.empty():
 		while not qu.empty():
 			msg = qu.get()
 			
