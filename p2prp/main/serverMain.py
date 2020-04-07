@@ -1,7 +1,8 @@
 import p2prp
 import p2prp.network.networkServer as netst
 import p2prp.ui.UIStation as guist
-import threading
+import p2prp.util.utilStation as util
+import threading, requests
 
 class ServerStation:
 	def __init__(self, console):
@@ -59,11 +60,12 @@ def runServer():
 					return
 				
 				elif cmd == 'ip':
-					import requests
+					nonlocal ext_ip
+					
 					if ext_ip == None:
 						ext_ip = requests.get('https://api.ipify.org').text
 					
-					# print('External ip: ', ext_ip)
+					printLog(station, 'External ip: ', ext_ip)
 		
 		except Exception as e:
 			print('Error occured, exiting.', type(e), e)
@@ -82,36 +84,3 @@ def runServer():
 	netst.closeServer(station)
 	
 	return
-	
-	# while True:
-		# try:
-			# command = input('> ')
-			# if not command:
-				# continue
-			
-			# if command[0] != '/':
-				# netst.serverSendMsg(station, bytes(command, 'utf-8'))
-			
-			# else:
-				# cmd = command[1:]
-				# if cmd == 'stop':
-					# break
-				
-				# elif cmd == 'ip':
-					# import requests
-					# if ext_ip == None:
-						# ext_ip = requests.get('https://api.ipify.org').text
-					
-					# # print('External ip: ', ext_ip)
-					# printLog(station, 'External ip: ', ext_ip)
-		
-		# except EOFError:
-			# break
-		
-		# except Exception as e:
-			# print('Error occured, terminating server: ', type(e), e)
-			# break
-	
-	# netst.closeServer(station)
-	
-	# return
