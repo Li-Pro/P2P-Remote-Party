@@ -4,6 +4,7 @@ import socket, threading, time
 # Network Client
 def recieveMsg(station):
 	
+	print('Thread started.')
 	while station.isClientActive:
 		try:
 			with station:
@@ -38,13 +39,17 @@ def joinParty(station, rmt):
 		station.sock = sock
 		
 		sock.connect(rmt)
-		station.addProcess(target=recieveMsg, args=(station,))
 		
 		station.isClientActive = True
+		station.addProcess(target=recieveMsg, args=(station,))
 	
 	return
 
 def sendMsgToServer(station, msg):
+	if not station.isClientActive:
+		print('No active connection.')
+		return
+	
 	with station:
 		sock = station.sock
 		print('Sending "' + str(''.join(map(chr,msg))) + '" to server: ', sock.getpeername())
@@ -65,6 +70,10 @@ def sendMsgToServer(station, msg):
 	return
 
 def leaveParty(station):
+	if not station.isClientActive:
+		print('No active connection.')
+		return
+	
 	print('Disconnecting.')
 	
 	with station:
