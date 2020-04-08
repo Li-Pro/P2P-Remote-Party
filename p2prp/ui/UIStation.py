@@ -4,7 +4,10 @@ import tkinter.scrolledtext
 
 import pyautogui as pagui
 
-import queue, threading
+import PIL
+from PIL import Image, ImageTk
+
+import queue, threading, io
 
 class LoggerConsole:
 	def __init__(self):
@@ -55,13 +58,33 @@ class StreamWindow:
 	def __init__(self, parent):
 		root = tk.Toplevel(parent)
 		
+		root.grid_rowconfigure(0, weight=1)
+		root.grid_columnconfigure(0, weight=1)
+		
 		img = tk.Label(root)
-		img.pack()
+		img.grid(row=0, column=0, sticky='nsew')
 		
 		self.root = root
 		self.img = img
 		
 		self.imglock = threading.Lock()
+	
+	def setImage(self, osize, data):
+		with self.imglock:
+			# image = PIL.Image.frombytes('RGBA', osize, data)
+			image = PIL.Image.open(io.BytesIO(data))
+			# image.thumbnail((osize[0]//2, osize[1]//2), PIL.Image.ANTIALIAS)
+			
+			size = pagui.size()
+			nsize = min(osize[0]//size[0], osize[1]//size[1]) * size
+			
+			image.thumbnail(nsize, PIL.Image.ANTIALIAS)
+			
+			photo = PIL.ImageTk.PhotoImage(image)
+			
+			self.img.configure(image=photo)
+			self.img.image = photo
+			
 	
 	def withdraw(self):
 		self.root.withdraw()

@@ -54,7 +54,6 @@ def runClient(rmtaddr=None, rmtport=None):
 		
 		try:
 			if not command[0] == '/':
-				# console.addLog(inp.get())
 				netst.sendRawMsgToServer(station, bytes(command, 'utf-8'))
 			
 			else:

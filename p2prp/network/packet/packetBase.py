@@ -65,7 +65,8 @@ def encode(pack):
 def registerPackets():
 	import p2prp.network.packet.packets as packs
 	
-	REG_PCLASS = [packs.PackA01OnStream, packs.PackA02OffStream, packs.PackA03RawMsg]
+	REG_PCLASS = [packs.PackA01OnStream, packs.PackA02OffStream, packs.PackA03RawMsg, \
+				packs.PackB01Stream]
 	
 	global PACK_REG
 	

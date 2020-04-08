@@ -118,6 +118,17 @@ def serverSendRawMsg(station, msg):
 	printLog(station, 'Posting "' + msg.decode('utf-8') + '".')
 	serverSendMsg(station, packs.PackA03RawMsg(msg))
 
+def syncStream(station):
+	
+	while station.isServerStreaming:
+		img = util.screenShot()
+		size = util.getScrRes()
+		
+		serverSendMsg(station, packs.PackB01Stream(size, img))
+		time.sleep(1/60)
+	
+	return
+
 def startStreaming(station, isStreaming):
 	if station.isServerStreaming == isStreaming:
 		return
@@ -127,6 +138,8 @@ def startStreaming(station, isStreaming):
 	
 	if isStreaming:
 		serverSendMsg(station, packs.PackA01OnStream())
+		station.addProcess(target=syncStream, args=(station,))
+	
 	else:
 		serverSendMsg(station, packs.PackA02OffStream())
 	
@@ -136,6 +149,7 @@ def closeServer(station):
 	
 	with station:
 		station.isServerOn = False
+		station.isServerStreaming = False
 		subprocs = station.subproc.copy()
 	
 	for proc in subprocs:
