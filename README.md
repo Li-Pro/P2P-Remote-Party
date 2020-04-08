@@ -7,9 +7,9 @@ Useful when playing 2-Player PC games remotely.
 Version
 ---
 Version alpha-pre1.
-### Phase 2/3
+### Phase 3/3
 - Constructed basic utilities.
-- Created modern GUIs.
+- Created streaming functions.
 
 License
 ---
