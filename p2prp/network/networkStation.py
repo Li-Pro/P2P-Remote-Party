@@ -1,5 +1,5 @@
 # import p2prp
-from p2prp.network.packet import packetBase
+import p2prp.network.packet.packetBase as pkbase
 import socket, threading, time
 
 BLOCKING_EXCP = (BlockingIOError, socket.timeout)
@@ -27,6 +27,34 @@ def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 		rep = e
 	
 	return rep
+
+def sendPack(sock, pack):
+	data = pkbase.encode(pack)
+	
+	datlen = len(data)
+	totalSent = 0
+	while totalSent < datlen:
+		nsent = sock.send(data[totalSent:])
+		if not nsent:
+			raise Exception('Sending error: connection has broken.')
+		
+		totalSent += nsent
+
+def recvPack(sock):
+	sock.settimeout(0.01)
+	data = sock.recv(15)
+	if not data:
+		return data
+	
+	pack_len = int(data[:10])
+	while len(data) < pack_len:
+		ndat = sock.recv(1024)
+		if not ndat:
+			raise Exception('Receiving error: connection has broken.')
+		
+		data += ndat
+	
+	return pkbase.decode(data)
 
 def stationStartup():
 	packetBase.registerPackets()

@@ -1,5 +1,7 @@
 import p2prp.network.networkStation as netst
 import p2prp.util.utilStation as util
+from p2prp.network.packet import packetBase
+
 import socket, threading, time
 
 LOG_MARK = '[networkClient]'
@@ -89,3 +91,6 @@ def leaveParty(station):
 	
 	station.sock.close()
 	return
+
+def stationStartup():
+	packetBase.registerPackets()
