@@ -47,6 +47,8 @@ def recvPack(sock):
 		return data
 	
 	pack_len = int(data[:10])
+	# print('Recv header: ', data, pack_len)
+	
 	while len(data) < pack_len:
 		ndat = sock.recv(1024)
 		if not ndat:
@@ -54,7 +56,8 @@ def recvPack(sock):
 		
 		data += ndat
 	
+	# print('Recv data: ', data)
 	return pkbase.decode(data)
 
 def stationStartup():
-	packetBase.registerPackets()
+	pkbase.registerPackets()

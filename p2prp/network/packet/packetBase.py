@@ -39,13 +39,14 @@ def decode(data):
 	
 	header = buf.read(15)
 	pack_len = int(header[:10])
-	pack_id = int(header[10:])
+	pack_id = header[10:].decode('utf-8').strip()
 	
 	if not pack_id in PACK_REG:
 		print('Receiving: <', pack_id, '>, which is not recognize in this side.')
 		return None
 	
 	pack_cls = PACK_REG[pack_id]
+	# print('Decoding type: ', pack_cls)
 	return pack_cls().fromBytes(buf)
 
 def encode(pack):
@@ -63,7 +64,6 @@ def encode(pack):
 	return header + data
 
 def registerPackets():
-	# from p2prp.network.packet import pa01onstream, pa02offstream, pa03rawmsg
 	import p2prp.network.packet.packets as packs
 	
 	REG_PCLASS = [packs.PackA03RawMsg] # [pa01onstream, pa02offstream, pa03rawmsg]

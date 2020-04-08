@@ -1,6 +1,6 @@
 import p2prp.network.networkStation as netst
 import p2prp.util.utilStation as util
-from p2prp.network.packet import packetBase
+from p2prp.network.packet import packetBase as pkbase, packets as packs
 
 import socket, threading, time
 
@@ -16,13 +16,16 @@ def recievePacket(station, ssock):
 			with ssock:
 				sock = ssock.sock
 				
-				sock.settimeout(0.1)
-				data = sock.recv(1024)
+				# sock.settimeout(0.1)
+				# data = sock.recv(1024)
+				data = netst.recvPack(sock)
 				
+				# print('Got packet: ', type(data))
 				if not data:
 					break
 				
-				printLog(station, 'Recieved: "', data.decode('utf-8'), '" from ', sock.getpeername())
+				data.serverHandlePacket(station, sock)
+				# printLog(station, 'Recieved: "', data.decode('utf-8'), '" from ', sock.getpeername())
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)
@@ -107,14 +110,15 @@ def serverSendMsg(station, msg):
 				clt = sclt.sock
 				printLog(station, 'Sending "' + msg.decode('utf-8') + '" to: ', clt.getpeername())
 				
-				clt.settimeout(0.1)
-				clt.send(msg)
+				# clt.settimeout(0.1)
+				# clt.send(msg)
+				netst.sendPack(clt, packs.PackA03RawMsg(msg))
 		
 		except netst.BLOCKING_EXCP:
 			print('Sending time out.')
 		
-		except:
-			print('Sending error.')
+		except Exception as e:
+			print('Sending error: ', type(e), e)
 	
 	return
 
@@ -132,4 +136,4 @@ def closeServer(station):
 	return
 
 def stationStartup():
-	packetBase.registerPackets()
+	pkbase.registerPackets()
