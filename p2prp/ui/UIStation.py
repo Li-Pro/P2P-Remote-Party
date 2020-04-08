@@ -2,7 +2,9 @@ import tkinter as tk
 import tkinter.font as tkfont
 import tkinter.scrolledtext
 
-import queue
+import pyautogui as pagui
+
+import queue, threading
 
 class LoggerConsole:
 	def __init__(self):
@@ -50,12 +52,29 @@ class LoggerConsole:
 		root.after(10, self.updateLogger)
 
 class StreamWindow:
-	pass
+	def __init__(self, parent):
+		root = tk.Toplevel(parent)
+		
+		img = tk.Label(root)
+		img.pack()
+		
+		self.root = root
+		self.img = img
+		
+		self.imglock = threading.Lock()
+	
+	def withdraw(self):
+		self.root.withdraw()
+	
+	def deiconify(self):
+		self.root.deiconify()
 
 def hostStreamWidget(parent):
-	root = tk.Toplevel(parent)
+	window = StreamWindow(parent)
+	window.root.title('P2PRP Stream')
+	window.root.wm_attributes('-fullscreen', 'true')
 	
-	return root
+	return window
 
 def hostConsole():
 	console = LoggerConsole()

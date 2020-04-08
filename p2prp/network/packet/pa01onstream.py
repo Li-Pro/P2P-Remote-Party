@@ -23,7 +23,5 @@ class PackA01OnStream(packetBase.S2CPacketBase):
 		with station:
 			station.isStreaming = True
 		
-		# print('Starting handling.')
-		# netst.handleStream(station)
 		netst.openStream(station)
 		printLog(station, 'Server is now streaming.')

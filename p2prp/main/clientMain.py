@@ -1,6 +1,7 @@
 import p2prp
 import p2prp.network.networkClient as netst
 import p2prp.ui.UIStation as guist
+import p2prp.util.utilStation as util
 import threading
 
 class ClientStation:
@@ -8,8 +9,10 @@ class ClientStation:
 		self.lock = threading.Lock()
 		self.sock = None
 		self.console = console
+		
 		self.streamWindow = guist.hostStreamWidget(console.root)
 		self.streamWindow.withdraw()
+		self.streamWindow.root.bind('<Escape>', lambda e: self.streamWindow.withdraw())
 		
 		self.subproc = []
 		
@@ -29,6 +32,10 @@ class ClientStation:
 	
 	def __exit__(self, type, value, traceback):
 		self.lock.release()
+
+def printLog(station, *args):
+	LOG_MARK = '[clientMain] '
+	station.console.addLog(util.toStr(LOG_MARK, *args))
 
 def runClient(rmtaddr=None, rmtport=None):
 	print('Running P2PRP client.')
@@ -72,6 +79,14 @@ def runClient(rmtaddr=None, rmtport=None):
 				elif cmd == 'stop':
 					root.destroy()
 					return
+				
+				elif cmd == 'show':
+					if not station.isStreaming:
+						printLog(station, 'No streaming now.')
+					
+					else:
+						with station:
+							station.streamWindow.deiconify()
 				
 				else:
 					pass

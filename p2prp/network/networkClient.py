@@ -51,32 +51,16 @@ def joinParty(station, rmt):
 	
 	return
 
-# def handleStreamWindow(station):
-	# with station:
-		# station.streamWindow = guist.hostStreamWidget()
-		# root = station.streamWindow
-	
-	# def streamUpdate():
-		# if not station.isStreaming:
-			# root.destroy()
-			# return
-		
-		# root.after(10, streamUpdate)
-	
-	# root.after(10, streamUpdate)
-	# root.mainloop()
-	# # while station.isStreaming:
-	
-	# return
-
 def closeStream(station):
 	with station:
 		station.streamWindow.withdraw()
+	
+	return
 
 def openStream(station):
 	with station:
 		station.streamWindow.deiconify()
-		# station.addProcess(target=handleStreamWindow, args=(station,))
+	
 	return
 
 def sendMsgToServer(station, pack):
