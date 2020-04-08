@@ -22,7 +22,7 @@ def recieveMsg(station):
 					station.isClientActive = False
 					break
 				
-				printLog(station, 'Recieved from server: ', str(''.join(map(chr, data))))
+				printLog(station, 'Recieved from server: ', data.decode('utf-8'))
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)
@@ -57,7 +57,7 @@ def sendMsgToServer(station, msg):
 	
 	with station:
 		sock = station.sock
-		printLog(station, 'Sending "' + str(''.join(map(chr,msg))) + '" to server.')
+		printLog(station, 'Sending "' + msg.decode('utf-8') + '" to server.')
 		
 		try:
 			sock.settimeout(0.1)

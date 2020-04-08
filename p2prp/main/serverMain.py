@@ -26,13 +26,14 @@ class ServerStation:
 	def __exit__(self, type, value, traceback):
 		self.lock.release()
 
-LOG_MARK = '[serverMain]: '
+LOG_MARK = '[serverMain] '
 
 def printLog(station, *args):
 	station.console.addLog(util.toStr(LOG_MARK, *args))
 
 def runServer():
 	print('Running P2PRP server.')
+	netst.stationStartup()
 	
 	console = guist.hostConsole()
 	station = ServerStation(console)

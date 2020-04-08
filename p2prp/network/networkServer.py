@@ -20,7 +20,7 @@ def recievePacket(station, ssock):
 				if not data:
 					break
 				
-				printLog(station, 'Recieved: "', str(''.join(map(chr, data))), '" from ', sock.getpeername())
+				printLog(station, 'Recieved: "', data.decode('utf-8'), '" from ', sock.getpeername())
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)
@@ -103,7 +103,7 @@ def serverSendMsg(station, msg):
 		try:
 			with sclt:
 				clt = sclt.sock
-				printLog(station, 'Sending "' + str(''.join(map(chr,msg))) + '" to: ', clt.getpeername())
+				printLog(station, 'Sending "' + msg.decode('utf-8') + '" to: ', clt.getpeername())
 				
 				clt.settimeout(0.1)
 				clt.send(msg)

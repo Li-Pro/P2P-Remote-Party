@@ -1,4 +1,5 @@
 # import p2prp
+from p2prp.network.packet import packetBase
 import socket, threading, time
 
 BLOCKING_EXCP = (BlockingIOError, socket.timeout)
@@ -26,3 +27,6 @@ def scheduleTimeout(sock, func, args=(), sctime=0.1, scintv=0.01):
 		rep = e
 	
 	return rep
+
+def stationStartup():
+	packetBase.registerPackets()

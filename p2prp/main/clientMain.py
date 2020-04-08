@@ -29,6 +29,7 @@ class ClientStation:
 
 def runClient(rmtaddr=None, rmtport=None):
 	print('Running P2PRP client.')
+	netst.stationStartup()
 	
 	console = guist.hostConsole()
 	station = ClientStation(console)
