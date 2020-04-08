@@ -1,5 +1,6 @@
 import p2prp.network.networkStation as netst
 import p2prp.util.utilStation as util
+import p2prp.ui.UIStation as guist
 from p2prp.network.packet import packetBase as pkbase, packets as packs
 
 import socket, threading, time
@@ -9,7 +10,7 @@ def printLog(station, *args):
 	station.console.addLog(util.toStr(LOG_MARK, *args))
 
 # Network Client
-def recieveMsg(station):
+def receiveMsg(station):
 	
 	while station.isClientActive:
 		try:
@@ -46,8 +47,36 @@ def joinParty(station, rmt):
 		sock.connect(rmt)
 		
 		station.isClientActive = True
-		station.addProcess(target=recieveMsg, args=(station,))
+		station.addProcess(target=receiveMsg, args=(station,))
 	
+	return
+
+# def handleStreamWindow(station):
+	# with station:
+		# station.streamWindow = guist.hostStreamWidget()
+		# root = station.streamWindow
+	
+	# def streamUpdate():
+		# if not station.isStreaming:
+			# root.destroy()
+			# return
+		
+		# root.after(10, streamUpdate)
+	
+	# root.after(10, streamUpdate)
+	# root.mainloop()
+	# # while station.isStreaming:
+	
+	# return
+
+def closeStream(station):
+	with station:
+		station.streamWindow.withdraw()
+
+def openStream(station):
+	with station:
+		station.streamWindow.deiconify()
+		# station.addProcess(target=handleStreamWindow, args=(station,))
 	return
 
 def sendMsgToServer(station, pack):

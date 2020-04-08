@@ -18,7 +18,10 @@ class PackA02OffStream(packetBase.S2CPacketBase):
 		return
 	
 	def clientHandlePacket(self, station, sock):
+		import p2prp.network.networkClient as netst
+		
 		with station:
 			station.isStreaming = False
 		
+		netst.closeStream(station)
 		printLog(station, 'Server is now off-streaming.')

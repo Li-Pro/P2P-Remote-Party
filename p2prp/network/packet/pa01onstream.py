@@ -18,7 +18,12 @@ class PackA01OnStream(packetBase.S2CPacketBase):
 		return
 	
 	def clientHandlePacket(self, station, sock):
+		import p2prp.network.networkClient as netst
+		
 		with station:
 			station.isStreaming = True
 		
+		# print('Starting handling.')
+		# netst.handleStream(station)
+		netst.openStream(station)
 		printLog(station, 'Server is now streaming.')

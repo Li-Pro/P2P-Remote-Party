@@ -72,10 +72,6 @@ def runServer():
 					printLog(station, 'External ip: ', ext_ip)
 				
 				elif cmd == 'stream':
-					# if not opt:
-						# printLog(station, 'Server streaming is ' + ('ON' if station.isServerStreaming else 'OFF'))
-					
-					# else:
 					if opt:
 						stat = opt[0]
 						if stat == 'on':

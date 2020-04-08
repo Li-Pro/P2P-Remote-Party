@@ -122,17 +122,13 @@ def startStreaming(station, isStreaming):
 	if station.isServerStreaming == isStreaming:
 		return
 	
-	# print('Trying to acquire lock.')
 	with station:
-		# print('Lock acquired.')
 		station.isServerStreaming = isStreaming
 	
 	if isStreaming:
 		serverSendMsg(station, packs.PackA01OnStream())
 	else:
 		serverSendMsg(station, packs.PackA02OffStream())
-	
-	# print('Finishing.')
 	
 
 def closeServer(station):

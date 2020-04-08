@@ -19,19 +19,19 @@ class PacketBase(ABC):
 		pass
 	
 	@abstractmethod
-	def clientHandlePacket(self, station):
+	def clientHandlePacket(self, station, sock):
 		pass
 	
 	@abstractmethod
-	def serverHandlePacket(self, station):
+	def serverHandlePacket(self, station, sock):
 		pass
 
 class S2CPacketBase(PacketBase):
-	def serverHandlePacket(self, station):
+	def serverHandlePacket(self, station, sock):
 		raise Exception('Server received client-side packet: ', type(self))
 
 class C2SPacketBase(PacketBase):
-	def clientHandlePacket(self, station):
+	def clientHandlePacket(self, station, sock):
 		raise Exception('Client received server-side packet: ', type(self))
 
 def decode(data):

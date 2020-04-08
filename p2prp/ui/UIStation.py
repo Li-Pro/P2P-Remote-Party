@@ -49,6 +49,14 @@ class LoggerConsole:
 		
 		root.after(10, self.updateLogger)
 
+class StreamWindow:
+	pass
+
+def hostStreamWidget(parent):
+	root = tk.Toplevel(parent)
+	
+	return root
+
 def hostConsole():
 	console = LoggerConsole()
 	

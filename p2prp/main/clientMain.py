@@ -8,6 +8,8 @@ class ClientStation:
 		self.lock = threading.Lock()
 		self.sock = None
 		self.console = console
+		self.streamWindow = guist.hostStreamWidget(console.root)
+		self.streamWindow.withdraw()
 		
 		self.subproc = []
 		
