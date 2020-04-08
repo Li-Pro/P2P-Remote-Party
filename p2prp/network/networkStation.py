@@ -1,4 +1,3 @@
-# import p2prp
 import p2prp.network.packet.packetBase as pkbase
 import socket, threading, time
 
@@ -47,7 +46,6 @@ def recvPack(sock):
 		return data
 	
 	pack_len = int(data[:10])
-	# print('Recv header: ', data, pack_len)
 	
 	while len(data) < pack_len:
 		ndat = sock.recv(1024)
@@ -56,7 +54,6 @@ def recvPack(sock):
 		
 		data += ndat
 	
-	# print('Recv data: ', data)
 	return pkbase.decode(data)
 
 def stationStartup():

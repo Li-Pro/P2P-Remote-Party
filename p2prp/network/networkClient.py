@@ -4,9 +4,8 @@ from p2prp.network.packet import packetBase as pkbase, packets as packs
 
 import socket, threading, time
 
-LOG_MARK = '[networkClient]'
-
 def printLog(station, *args):
+	LOG_MARK = '[networkClient]'
 	station.console.addLog(util.toStr(LOG_MARK, *args))
 
 # Network Client
@@ -17,16 +16,13 @@ def recieveMsg(station):
 			with station:
 				sock = station.sock
 				
-				# sock.settimeout(0.1)
-				# data = sock.recv(1024)
 				data = netst.recvPack(sock)
 				
 				if not data:
 					station.isClientActive = False
 					break
-				
-				data.clientHandlePacket(station, sock)
-				# printLog(station, 'Recieved from server: ', data.decode('utf-8'))
+			
+			data.clientHandlePacket(station, sock)
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)
@@ -54,19 +50,16 @@ def joinParty(station, rmt):
 	
 	return
 
-def sendMsgToServer(station, msg):
+def sendMsgToServer(station, pack):
 	if not station.isClientActive:
 		print('No active connection.')
 		return
 	
 	with station:
 		sock = station.sock
-		printLog(station, 'Sending "' + msg.decode('utf-8') + '" to server.')
 		
 		try:
-			# sock.settimeout(0.1)
-			# sock.send(msg)
-			netst.sendPack(sock, packs.PackA03RawMsg(msg))
+			netst.sendPack(sock, pack)
 		
 		except BlockingIOError as e:
 			print('Sending time out.')
@@ -78,6 +71,10 @@ def sendMsgToServer(station, msg):
 			print('Sending error: ', type(e), e)
 	
 	return
+
+def sendRawMsgToServer(station, msg):
+	printLog(station, 'Sending "' + msg.decode('utf-8') + '" to server.')
+	sendMsgToServer(station, packs.PackA03RawMsg(msg))
 
 def leaveParty(station):
 	if not station.isClientActive:

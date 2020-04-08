@@ -12,6 +12,7 @@ class ClientStation:
 		self.subproc = []
 		
 		self.isClientActive = False
+		self.isStreaming = False
 	
 	def renew(self, console):
 		self.__init__(console)
@@ -45,7 +46,7 @@ def runClient(rmtaddr=None, rmtport=None):
 		try:
 			if not command[0] == '/':
 				# console.addLog(inp.get())
-				netst.sendMsgToServer(station, bytes(command, 'utf-8'))
+				netst.sendRawMsgToServer(station, bytes(command, 'utf-8'))
 			
 			else:
 				cmds = command[1:].split(' ')

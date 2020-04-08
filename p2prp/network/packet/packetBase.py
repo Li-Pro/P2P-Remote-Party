@@ -26,13 +26,13 @@ class PacketBase(ABC):
 	def serverHandlePacket(self, station):
 		pass
 
-class ClientPacketBase(PacketBase):
+class S2CPacketBase(PacketBase):
 	def serverHandlePacket(self, station):
-		raise Exception('Client received server-side packet: ', type(self))
-
-class ServerPacketBase(PacketBase):
-	def clientHandlePacket(self, station):
 		raise Exception('Server received client-side packet: ', type(self))
+
+class C2SPacketBase(PacketBase):
+	def clientHandlePacket(self, station):
+		raise Exception('Client received server-side packet: ', type(self))
 
 def decode(data):
 	buf = io.BytesIO(data)
@@ -46,7 +46,6 @@ def decode(data):
 		return None
 	
 	pack_cls = PACK_REG[pack_id]
-	# print('Decoding type: ', pack_cls)
 	return pack_cls().fromBytes(buf)
 
 def encode(pack):
@@ -66,7 +65,7 @@ def encode(pack):
 def registerPackets():
 	import p2prp.network.packet.packets as packs
 	
-	REG_PCLASS = [packs.PackA03RawMsg] # [pa01onstream, pa02offstream, pa03rawmsg]
+	REG_PCLASS = [packs.PackA01OnStream, packs.PackA02OffStream, packs.PackA03RawMsg]
 	
 	global PACK_REG
 	

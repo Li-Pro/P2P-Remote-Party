@@ -4,9 +4,8 @@ from p2prp.network.packet import packetBase as pkbase, packets as packs
 
 import socket, threading, time
 
-LOG_MARK = '[networkServer] '
-
 def printLog(station, *args):
+	LOG_MARK = '[networkServer] '
 	station.console.addLog(util.toStr(LOG_MARK, *args))
 
 # Network Server
@@ -16,16 +15,12 @@ def recievePacket(station, ssock):
 			with ssock:
 				sock = ssock.sock
 				
-				# sock.settimeout(0.1)
-				# data = sock.recv(1024)
 				data = netst.recvPack(sock)
 				
-				# print('Got packet: ', type(data))
 				if not data:
 					break
 				
 				data.serverHandlePacket(station, sock)
-				# printLog(station, 'Recieved: "', data.decode('utf-8'), '" from ', sock.getpeername())
 		
 		except netst.BLOCKING_EXCP:
 			time.sleep(0.01)
@@ -99,7 +94,7 @@ def startAuthorization(station):
 	
 	return
 
-def serverSendMsg(station, msg):
+def serverSendMsg(station, pack):
 	cllist = {}
 	with station:
 		cllist = station.clientList
@@ -108,11 +103,8 @@ def serverSendMsg(station, msg):
 		try:
 			with sclt:
 				clt = sclt.sock
-				printLog(station, 'Sending "' + msg.decode('utf-8') + '" to: ', clt.getpeername())
 				
-				# clt.settimeout(0.1)
-				# clt.send(msg)
-				netst.sendPack(clt, packs.PackA03RawMsg(msg))
+				netst.sendPack(clt, pack)
 		
 		except netst.BLOCKING_EXCP:
 			print('Sending time out.')
@@ -121,6 +113,27 @@ def serverSendMsg(station, msg):
 			print('Sending error: ', type(e), e)
 	
 	return
+
+def serverSendRawMsg(station, msg):
+	printLog(station, 'Posting "' + msg.decode('utf-8') + '".')
+	serverSendMsg(station, packs.PackA03RawMsg(msg))
+
+def startStreaming(station, isStreaming):
+	if station.isServerStreaming == isStreaming:
+		return
+	
+	# print('Trying to acquire lock.')
+	with station:
+		# print('Lock acquired.')
+		station.isServerStreaming = isStreaming
+	
+	if isStreaming:
+		serverSendMsg(station, packs.PackA01OnStream())
+	else:
+		serverSendMsg(station, packs.PackA02OffStream())
+	
+	# print('Finishing.')
+	
 
 def closeServer(station):
 	print('Closing server.')

@@ -14,6 +14,7 @@ class ServerStation:
 		self.subproc = []
 		
 		self.isServerOn = False
+		self.isServerStreaming = False
 	
 	def addProcess(self, *args, **kwargs):
 		nproc = threading.Thread(*args, **kwargs)
@@ -26,9 +27,8 @@ class ServerStation:
 	def __exit__(self, type, value, traceback):
 		self.lock.release()
 
-LOG_MARK = '[serverMain] '
-
 def printLog(station, *args):
+	LOG_MARK = '[serverMain] '
 	station.console.addLog(util.toStr(LOG_MARK, *args))
 
 def runServer():
@@ -52,10 +52,13 @@ def runServer():
 		
 		try:
 			if command[0] != '/':
-				netst.serverSendMsg(station, bytes(command, 'utf-8'))
+				netst.serverSendRawMsg(station, bytes(command, 'utf-8'))
 			
 			else:
-				cmd = command[1:]
+				cmds = command[1:].split(' ')
+				opt = cmds[1:]
+				cmd = cmds[0]
+				
 				if cmd == 'stop':
 					root.destroy()
 					return
@@ -67,6 +70,21 @@ def runServer():
 						ext_ip = requests.get('https://api.ipify.org').text
 					
 					printLog(station, 'External ip: ', ext_ip)
+				
+				elif cmd == 'stream':
+					# if not opt:
+						# printLog(station, 'Server streaming is ' + ('ON' if station.isServerStreaming else 'OFF'))
+					
+					# else:
+					if opt:
+						stat = opt[0]
+						if stat == 'on':
+							netst.startStreaming(station, True)
+						
+						elif stat == 'off':
+							netst.startStreaming(station, False)
+					
+					printLog(station, 'Server streaming is ' + ('ON' if station.isServerStreaming else 'OFF'))
 		
 		except Exception as e:
 			print('Error occured, exiting.', type(e), e)
