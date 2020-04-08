@@ -59,6 +59,7 @@ def closeStream(station):
 
 def openStream(station):
 	with station:
+		station.console.root.iconify()
 		station.streamWindow.deiconify()
 	
 	return

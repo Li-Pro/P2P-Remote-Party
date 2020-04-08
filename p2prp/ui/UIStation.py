@@ -71,9 +71,7 @@ class StreamWindow:
 	
 	def setImage(self, osize, data):
 		with self.imglock:
-			# image = PIL.Image.frombytes('RGBA', osize, data)
 			image = PIL.Image.open(io.BytesIO(data))
-			# image.thumbnail((osize[0]//2, osize[1]//2), PIL.Image.ANTIALIAS)
 			
 			size = pagui.size()
 			nsize = min(osize[0]//size[0], osize[1]//size[1]) * size

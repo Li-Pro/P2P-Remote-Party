@@ -138,6 +138,7 @@ def startStreaming(station, isStreaming):
 	
 	if isStreaming:
 		serverSendMsg(station, packs.PackA01OnStream())
+		station.console.root.iconify()
 		station.addProcess(target=syncStream, args=(station,))
 	
 	else:

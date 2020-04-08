@@ -6,8 +6,6 @@ class PackB01Stream(pkbase.S2CPacketBase):
 	def __init__(self, size=(0,0), data=b''):
 		self.size = size
 		self.data = data
-		
-		# print('Data: ', size, len(data))
 	
 	@staticmethod
 	def getID():
@@ -25,5 +23,3 @@ class PackB01Stream(pkbase.S2CPacketBase):
 	
 	def clientHandlePacket(self, station, sock):
 		station.streamWindow.setImage(self.size, self.data)
-		
-		# print('Receiving stream: ', self.size, len(self.data))
